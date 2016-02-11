@@ -35,10 +35,17 @@
       ((eq? (car sub) (car seq)) (removesubsequence (cdr sub) (cdr seq)))
       (else (cons (car seq) (removesubsequence sub (cdr seq)))))))
 
-; asd
+; Helper function for reverse*
+(define (innerreverse l p)
+  (cond
+    ((null? l) p)
+    ((list? (car l)) (innerreverse (cdr l) (cons (reverse* (car l)) p)))
+    (else (innerreverse (cdr l) (cons (car l) p)))))
+
+; Given a list, returns a list with all atoms and inner lists reversed
 (define reverse*
   (lambda (l)
-    0))
+    (innerreverse* l '())))
 
 ; Given a list of lists, returns the first atom that appears in the list,
 ; regardless of how nested it is
@@ -54,6 +61,44 @@
 (define last*
   (lambda (l)
     (cond
-      ((or (null? l) (not (list? l))) l)
+      ((not (pair? l)) l)
       ((null? (cdr l)) (last* (car l)))
       (else (last* (cdr l))))))
+
+; asd
+(define numorder*?
+  (lambda (l)
+    (cond
+      ((or (null? l) (null? (cdr l))) #t)
+      ((and (number? (cadr l))(> (car l) (cadr l))) #f)
+      (else (inorder? (cdr l))))))
+
+; Given a matrix, returns the given matrix without its first column
+; Necessary for vectormult
+(define rmcolumn
+  (lambda (m)
+    (if (null? m)
+        m
+        (cons (cdar m) (rmcolumn (cdr m))))))
+
+; Given a matrix, returns the first column in the matrix
+; Necessary for vectormult
+(define getcolumn
+  (lambda (m)
+    (if (null? m)
+        m
+        (cons (caar m) (getcolumn (cdr m))))))
+
+; Given a vector and a matrix, returns the product of the vector and the matrix
+(define vectormult
+  (lambda (v m)
+    (if (or (null? m) (null? (car m)))
+        '()
+        (cons (dotproduct v (getcolumn m)) (vectormult v (rmcolumn m))))))
+
+; Given two matrices, returns the product of the two matrices
+(define matrixmultiply
+  (lambda (m1 m2)
+    (if (or (null? m1) (null? m2))
+        '()
+        (cons (vectormult (car m1) m2) (matrixmultiply (cdr m1) m2)))))
