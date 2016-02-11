@@ -1,0 +1,151 @@
+\documentclass[letterpaper]{article}
+
+% used for unnumbered equations
+\usepackage{amsmath}
+% used for enumerating problem parts by letter
+\usepackage{enumerate}
+% used for margins
+\usepackage[letterpaper,left=1.25in,right=1.25in,top=1in,bottom=1in]{geometry}
+% used for header and page numbers
+\usepackage{fancyhdr}
+% used for preventing paragraph indentation
+\usepackage[parfill]{parskip}
+% used for section formatting as problem
+\usepackage[explicit]{titlesec}
+% used for subsection indentation
+\usepackage{changepage}
+
+\pagestyle{fancy}
+\fancyfoot{}
+% header/footer settings
+\lhead{Kevin Nash}
+\chead{EECS 345 -- Written Exercise 1}
+\rhead{\today}
+\cfoot{\thepage}
+
+\titleformat{\section}{\normalfont\large\bfseries}{}{0em}{#1\ \thesection}
+\newcommand{\problem}{\section{Problem}}
+\newenvironment{shift}
+    {\adjustwidth{3em}{0pt}}
+    {\endadjustwidth}
+
+\begin{document}
+
+\problem{}
+\begin{tabular}{l l}
+    \texttt{<C>}\quad$\rightarrow$\quad\texttt{<T> | <V> = <C>} & assignment (command)\\
+    \texttt{<T>}\quad$\rightarrow$\quad\texttt{<O> | <T> ? <C> : <C> } & ternary\\
+    \texttt{<O>}\quad$\rightarrow$\quad\texttt{<A> | <C> || <C>} & or\\
+    \texttt{<A>}\quad$\rightarrow$\quad\texttt{<N> | <C> \&\& <C>} & and\\
+    \texttt{<N>}\quad$\rightarrow$\quad\texttt{<P> | !<C>} & not\\
+    \texttt{<P>}\quad$\rightarrow$\quad\texttt{<B> | (<C>)} & parentheses\\
+    \texttt{<B>}\quad$\rightarrow$\quad\texttt{<V> | true | false} & boolean\\
+    \texttt{<V>}\quad$\rightarrow$\quad\texttt{x | y | z} & value
+\end{tabular}
+
+\problem{}
+\texttt{<start$_1$>.typetable := <stmt$_3$>.typetable ; <start$_3$>.typetable}\\
+\texttt{<start$_1$>.inittable := <stmt$_3$>.inittable ; <start$_3$>.inittable}
+
+\texttt{<start$_2$>.typetable := <stmt$_4$>.typetable}\\
+\texttt{<start$_2$>.typetable := <stmt$_4$>.inittable}
+
+\texttt{<stmt$_1$>.typetable := <declare$_2$>.typetable}\\
+\texttt{<stmt$_1$>.inittable := <declare$_2$>.inittable}
+
+\texttt{<stmt$_2$>.inittable := <assign$_2$>.inittable}
+
+\texttt{<declare$_1$>.typebinding := (<var>, <type>)}\\
+\texttt{<declare$_1$>.initialized := (<var>, false)}
+
+\texttt{<type$_1$>.type := integer}
+
+\texttt{<type$_2$>.type := double}
+
+\texttt{<assign$_1$>.initialized :=}\\ \ldots\quad \texttt{(typetable(<var>) = expression$_3$.type) ?\ (<var>, true) :\ (<var>, false)}
+
+\texttt{<expression$_1$>.type :=}\\ \ldots\quad \texttt{(<expression$_4$>.type = integer \&\& <expression$_5$>.type = integer) ?\ integer :\ double}
+
+\texttt{<expression$_2$>.type := <value$_4$>.type}
+
+\texttt{<value$_1$>.type := typetable(<var>)}
+
+\texttt{<value$_2$>.type := integer}
+
+\texttt{<value$_3$>.type := double}
+
+\problem{}
+\begin{enumerate}
+\item Within \texttt{<assign$_1$>} the variable type should be checked against the expression type. Specifically, if the following evalutates \texttt{false}, raise an error:
+
+\texttt{typetable(<var>) = <expression$_3$>.type}
+
+\item Within \texttt{<assign$_1$>} the variable should be checked as declared before it can be used. Specifically, if the following evaluates \texttt{true}, raise an error:
+
+\texttt{typetable(<var>) = error}
+
+\item Within \texttt{<value$_1$>} the variable should be checked as initialized before it can otherwise be used. Specifically, if the following evaluates \texttt{false}, raise an error:
+
+\texttt{if inittable(<var>) = true}
+\end{enumerate}
+
+%\vspace{-0.1 in}
+\problem{}
+\textbf{Inner loop invariant:} $A[i]\geq A[0..i-1]$
+\begin{shift}
+    \textbf{Initialization:} At the start of the loop, $i = 0$ and thus, since $A[0..i]$ contains one element, ${A[i]\geq A[0..i-1]}$
+
+    \textbf{Maintenance:} With each loop, $A[i]$ is assigned the larger value of $A[i-1]$ and $A[i]$, so the loop invariant holds.
+
+    \textbf{Termination:} When the loop terminates, $i=bound-1$. Therefore, due to the loop invariant, $A[i]\geq A[0..bound-1]$.
+\end{shift}
+
+\textbf{Outer loop invariant:} $A[bound-1..n-1]$ is sorted in non-descending order and is greater than $A[0..bound-1]$.
+\begin{shift}
+    \textbf{Initialization:} At the start of the loop, $bound=n$. Therefore the array $A[bound-1..n-1]$ is empty, so the loop invariant holds trivially.
+
+    \textbf{Maintenance:} An overview of the inner loop invariant maintains that $A[i]\leq A[j], \text{for}\ i<j$, which holds that the current array is sorted in non-decreasing order.
+
+    \textbf{Termination:} When the loop terminates, $bound=0$. Therefore, we can apply a bound of the entire length of $A$ to our loop invariant, which holds that $A[0..n-1]$ is sorted in non-decreasing order.
+\end{shift}
+
+\problem{}
+\textbf{Defining \texttt{<assign>}}:
+\begin{verbatim}
+Mstate(<var> = <expression>, s) = {
+    s1 = Mstate(<expression>, s)
+    name = Mname(<var>, s)
+    val = Mvalue(<expression>, s)
+    if name is error
+        return error
+    else
+        s1 = Remove(name, s)
+        s1 = Add(name, val, s)
+    return s1
+}
+\end{verbatim}
+\textbf{Defining \texttt{<if>}}:
+\begin{verbatim}
+Mstate(if <condition> then <statement1> else <statement2>, s) = {
+    s1 = Mstate(<condition>, s)
+    cond = Mboolean(<condition>, s)
+    if cond is true
+        s1 = Mstate(<statement1>, s)
+    if cond is false
+        s1 = Mstate(<statement2>, s)
+    return s1
+}
+\end{verbatim}
+\textbf{Defining \texttt{<while>}}:
+\begin{verbatim}
+Mstate(while <condition> <loop body>, s) = {
+    s1 = Mstate(<condition>, s)
+    cond = Mboolean(<condition>, s)
+    loop if cond is true
+        s1 = Mstate(<loop body>, s)
+        cond = Mboolean(<condition>, s)
+    return s1
+}
+\end{verbatim}
+
+\end{document}
