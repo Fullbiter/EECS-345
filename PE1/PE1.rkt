@@ -6,7 +6,7 @@
   (lambda (l)
     (cond
       ((or (null? l) (null? (cdr l))) #t)
-      ((and (number? (car (cdr l)))(> (car l) (car (cdr l)))) #f)
+      ((and (number? (cadr l))(> (car l) (cadr l))) #f)
       (else (inorder? (cdr l))))))
 
 ; Given two vectors, returns the dot product of the vectors
@@ -54,6 +54,6 @@
 (define last*
   (lambda (l)
     (cond
-      ((null? l) l)
-      ((pair? (car l)) (first* (car l)))
-      (else (car l)))))
+      ((or (null? l) (not (list? l))) l)
+      ((null? (cdr l)) (last* (car l)))
+      (else (last* (cdr l))))))
