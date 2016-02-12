@@ -1,7 +1,9 @@
 var x;
 x = 10;
 var y = 3 * x + 5;
-while (y % x != 3)
+var t = true;
+var f = !(false || t);
+while (y % x != 3 && t && f)
   y = y + 1;
 if (x > y)
   return x;
