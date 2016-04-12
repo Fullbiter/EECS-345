@@ -62,23 +62,38 @@ void* remove_from_back(list* ls)
     return data;
 }
 
+void transfer(void* a1[], void* a2[], int len, void (*add)(void*, list*), void* (*rm)(list*))
+{
+    list* ls = (list*)calloc(1, sizeof(list));
+    for (int i = 0; i < len; i++)
+    {
+        (add)(&a1[i], ls);
+    }
+    for (int i = 0; i < len; i++)
+    {
+        a2[i] = (rm)(ls);
+    }
+    for (int i = 0; i < len; i++)
+    {
+        printf("%d ", *a2[i]);
+    }
+}
+
 /* */
 int main()
 {
-    list* ls = (list*)calloc(1, sizeof(list));
-    node* head = (node*)calloc(1, sizeof(node));
-    node* tail = (node*)calloc(1, sizeof(node));
+    //list* ls = (list*)calloc(1, sizeof(list));
+    //node* head = (node*)calloc(1, sizeof(node));
+    //node* tail = (node*)calloc(1, sizeof(node));
     
-    add_to_front((int*)1, ls);
-    add_to_front((int*)2, ls);
-    add_to_front((int*)3, ls);
+    int a1[5] = {1,2,3,4,5};
+    void* a2[5];
 
-    printf("%i, %i, %i\n", ls->head->data, ls->head->next->data, ls->head->next->next->data);
-    printf("Removed %i\n", remove_from_back(ls));
-    printf("%i, %i\n", ls->head->data, ls->head->next->data);
-    printf("Removed %i\n", remove_from_back(ls));
-    printf("%i\n", ls->head->data);
-    printf("Removed %i\n", remove_from_back(ls));
+    //add_to_back((int*)1, ls);
+    //add_to_back((int*)2, ls);
+    //add_to_back((int*)3, ls);
+
+    transfer(a1, a2, 5, add_to_back, remove_from_front);
 
     return(0);
 }
