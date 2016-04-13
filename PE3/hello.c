@@ -86,7 +86,7 @@ int main()
     //node* head = (node*)calloc(1, sizeof(node));
     //node* tail = (node*)calloc(1, sizeof(node));
     
-    int a1[5] = {1,2,3,4,5};
+    void* a1[5] = {1, 2, 3, 4, 5};
     void* a2[5];
 
     //add_to_back((int*)1, ls);
