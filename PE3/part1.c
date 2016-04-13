@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/* type node */
 typedef struct node
 {
     void* data;         // data member
@@ -9,14 +8,12 @@ typedef struct node
     struct node* prev;  // pointer to the previous node (backward)
 } node;
 
-/* type list */
 typedef struct list
 {
     node* head; // pointer to the first node (head)
     node* tail; // pointer to the last node (tail)
 } list;
 
-/* */
 void add_to_front(void* data, list* ls)
 {
     node* n = (node*)calloc(1, sizeof(node));   // allocate memory for the node
@@ -31,7 +28,6 @@ void add_to_front(void* data, list* ls)
     ls->head = n;           // set list's head pointer to the new node
 }
 
-/* */
 void add_to_back(void* data, list* ls)
 {
     node* n = (node*)calloc(1, sizeof(node));   // allocate memory for the node
@@ -73,27 +69,39 @@ void transfer(void* a1[], void* a2[], int len, void (*add)(void*, list*), void* 
     {
         a2[i] = (rm)(ls);
     }
-    for (int i = 0; i < len; i++)
-    {
-        printf("%d ", *a2[i]);
-    }
 }
 
-/* */
 int main()
 {
-    //list* ls = (list*)calloc(1, sizeof(list));
-    //node* head = (node*)calloc(1, sizeof(node));
-    //node* tail = (node*)calloc(1, sizeof(node));
-    
-    void* a1[5] = {1, 2, 3, 4, 5};
+    void* a1[5] = {(int*)1, (int*)2, (int*)3, (int*)4, (int*)5};
     void* a2[5];
 
-    //add_to_back((int*)1, ls);
-    //add_to_back((int*)2, ls);
-    //add_to_back((int*)3, ls);
+    transfer(a1, a2, 5, add_to_front, remove_from_front);
+    for (int i = 0; i < 5; i++)
+    {
+        printf("%i ", *a2[i]);
+    }
+    printf("\n");
+
+    transfer(a1, a2, 5, add_to_front, remove_from_back);
+    for (int i = 0; i < 5; i++)
+    {
+        printf("%i ", *a2[i]);
+    }
+    printf("\n");
 
     transfer(a1, a2, 5, add_to_back, remove_from_front);
+    for (int i = 0; i < 5; i++)
+    {
+        printf("%i ", *a2[i]);
+    }
+    printf("\n");
 
-    return(0);
+    transfer(a1, a2, 5, add_to_back, remove_from_back);
+    for (int i = 0; i < 5; i++)
+    {
+        printf("%i ", *a2[i]);
+    }    
+
+    return 0;
 }
